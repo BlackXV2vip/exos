@@ -1,0 +1,135 @@
+#!/usr/bin/env bash
+# ═══════════════════════════════════════════════════════════════
+#  🚀 Exos Agent — المثبّت الرسمي | Official one-command installer
+#
+#  التثبيت الكامل بأمر واحد:
+#    curl -fsSL https://raw.githubusercontent.com/BlackXV2vip/exos/main/install | bash
+#
+#  بيعمل إيه؟
+#   1) ينزّل أحدث إصدار ويتحقق من SHA256
+#   2) يسطّب exos-agent في ~/.local/bin
+#   3) يسطّب مكتبات بايثون للجسر المجاني
+#   4) ينزّل الجسر (exos_adapter.py) + الكونفيج الجاهز
+#   5) يعمل أمر exos-bridge لتشغيل الجسر بضغطة واحدة
+# ═══════════════════════════════════════════════════════════════
+set -euo pipefail
+
+REPO="BlackXV2vip/exos"
+CYAN='\033[0;36m'; GREEN='\033[0;32m'; DIM='\033[0;2m'; RED='\033[0;31m'; NC='\033[0m'
+info() { echo -e "${CYAN}▸${NC} $*"; }
+ok()   { echo -e "${GREEN}✔${NC} $*"; }
+warn() { echo -e "${RED}⚠${NC} $*"; }
+
+echo -e "${CYAN}"
+cat <<'BANNER'
+  █▀▀ █ █ █▀█ █▀▀   █▀█ █▀▀ █▀▀ █▀█ ▀█▀
+  █▀   █  █ █ ▀▀█   █▀█ █▀█ █▀  █ █  █
+  ▀▀▀  ▀  ▀▀▀ ▀▀▀   ▀ ▀ ▀▀▀ ▀▀▀ ▀ ▀  ▀
+BANNER
+echo -e "${NC}"
+echo -e "${DIM}  Exos Agent Installer — by HackerExos · https://t.me/HackerExos_VIP${NC}"
+echo
+
+# ─── 0) فحص المنصة (PC أو موبايل/Termux proot) ───
+OS="$(uname -s)"; ARCH="$(uname -m)"
+case "$ARCH" in
+  x86_64)          PKG_ARCH="x64" ;;
+  aarch64|arm64)   PKG_ARCH="arm64" ;;   # هواتف: Termux proot-distro Debian/Ubuntu
+  *) PKG_ARCH="" ;;
+esac
+if [[ "$OS" != "Linux" || -z "$PKG_ARCH" ]]; then
+  warn "الإصدارات الجاهزة لـ Linux x86_64 و aarch64 (ARM64) بس — عندك $OS/$ARCH"
+  warn "Prebuilt binaries: Linux x86_64 & aarch64 (ARM64/Termux). Build from source: https://github.com/$REPO"
+  exit 1
+fi
+TARBALL="exos-agent-linux-$PKG_ARCH.tar.gz"
+info "المنصة: Linux/$ARCH → نسخة $TARBALL"
+for cmd in curl tar sha256sum python3; do
+  command -v "$cmd" >/dev/null 2>&1 || { warn "الأمر '$cmd' مش موجود — سطّبه الأول (missing: $cmd)"; exit 1; }
+done
+
+# ─── 1) تحديد الإصدار (VERSION env اختيارية — بيجّيها أمر exos-agent upgrade) ───
+if [[ -n "${VERSION:-}" ]]; then
+  TAG="v${VERSION#v}"
+  info "إصدار مُحدد: $TAG"
+else
+  info "بنجيب رقم أحدث إصدار من GitHub..."
+  TAG="$(curl -fsSL "https://api.github.com/repos/$REPO/releases/latest" | sed -n 's/.*"tag_name": *"\([^"]*\)".*/\1/p' | head -1)"
+  [[ -n "$TAG" ]] || { warn "معرفناش نجيب رقم الإصدار — اتأكد من النت"; exit 1; }
+  ok "أحدث إصدار: $TAG"
+fi
+
+# ─── 2) التحميل + التحقق ───
+FREE_KB="$(df -k "${TMPDIR:-/tmp}" 2>/dev/null | awk 'NR==2{print $4}' || echo 0)"
+if [[ "${FREE_KB:-0}" -lt 250000 ]]; then
+  warn "المساحة الفاضية في ${TMPDIR:-/tmp} أقل من 250MB (مطلوب ~200MB للتحميل والفك)"
+  warn "حرّر مساحة أو وجّه التحميل لمكان تاني:  TMPDIR=/sdcard/tmp bash install"
+  exit 1
+fi
+TMPD="$(mktemp -d)"; trap 'rm -rf "$TMPD"' EXIT
+BASE="https://github.com/$REPO/releases/download/$TAG"
+info "بننزّل exos-agent ($TAG)..."
+curl -fSL --progress-bar -o "$TMPD/$TARBALL" "$BASE/$TARBALL"
+curl -fsSL -o "$TMPD/SHA256SUMS.txt" "$BASE/SHA256SUMS.txt"
+info "بنتحقق من SHA256..."
+( cd "$TMPD" && sha256sum -c SHA256SUMS.txt --ignore-missing --quiet )
+ok "الهاش مطابق — الملف أصلي ✅"
+
+# ─── 3) التثبيت ───
+BIN_DIR="$HOME/.local/bin"; mkdir -p "$BIN_DIR"
+tar xzf "$TMPD/$TARBALL" -C "$TMPD"
+install -m 0755 "$TMPD/exos-agent" "$BIN_DIR/exos-agent"
+ok "اتسطّب في $BIN_DIR/exos-agent"
+if [[ ":$PATH:" != *":$BIN_DIR:"* ]]; then
+  LINE='export PATH="$HOME/.local/bin:$PATH"'
+  for rc in "$HOME/.bashrc" "$HOME/.profile"; do
+    [[ -f "$rc" ]] && ! grep -q '.local/bin' "$rc" 2>/dev/null && echo -e "\n# Exos Agent\n$LINE" >> "$rc" || true
+  done
+  warn "ضِفنا $BIN_DIR لـ PATH في ملفات الشل — افتح تيرمينال جديد أو اعمل: export PATH=\"\$HOME/.local/bin:\$PATH\""
+fi
+
+# ─── 4) مكتبات الجسر ───
+info "بنسطّب مكتبات بايثون للجسر المجاني..."
+PIP_OK=0
+python3 -m pip --version >/dev/null 2>&1 || { python3 -m ensurepip --user >/dev/null 2>&1 || true; }
+for try in "python3 -m pip install -q --user requests pycryptodome" \
+           "python3 -m pip install -q --user --break-system-packages requests pycryptodome" \
+           "python3 -m pip install -q --break-system-packages requests pycryptodome"; do
+  if $try >/dev/null 2>&1; then PIP_OK=1; break; fi
+done
+[[ $PIP_OK == 1 ]] && ok "مكتبات الجسر جاهزة" || warn "مقدرناش نسطّب المكتبات تلقائي — جرّب بنفسك: pip3 install requests pycryptodome"
+
+# ─── 5) الجسر + الكونفيج ───
+CONF_DIR="$HOME/.config/exos-agent"; mkdir -p "$CONF_DIR"
+curl -fsSL -o "$CONF_DIR/exos_adapter.py" "https://raw.githubusercontent.com/$REPO/main/exos_adapter.py"
+if [[ ! -f "$CONF_DIR/exos-agent.json" ]]; then
+  curl -fsSL -o "$CONF_DIR/exos-agent.json" "https://raw.githubusercontent.com/$REPO/main/examples/exos-agent.json"
+  ok "الكونفيج الجاهز اتسطّب"
+else
+  ok "عندك كونفيج موجود — سِبناه زي ما هو"
+fi
+cat > "$BIN_DIR/exos-bridge" <<EOF
+#!/usr/bin/env bash
+# 🌉 تشغيل الجسر المجاني لـ Exos Agent
+exec python3 "$CONF_DIR/exos_adapter.py" "\$@"
+EOF
+chmod +x "$BIN_DIR/exos-bridge"
+ok "أمر exos-bridge جاهز"
+
+# ─── 6) النهاية ───
+V="$("$BIN_DIR/exos-agent" --version 2>/dev/null || echo '?')"
+echo
+echo -e "${GREEN}═══════════════════════════════════════════════════════${NC}"
+echo -e "${GREEN}  ✅ Exos Agent $V اتسطّب بنجاح!${NC}"
+echo -e "${GREEN}═══════════════════════════════════════════════════════${NC}"
+echo
+echo -e "  ${CYAN}التشغيل (خطوتين):${NC}"
+echo -e "  1️⃣  افتح تيرمينال وسِيّبه شغال:   ${GREEN}exos-bridge${NC}"
+echo -e "  2️⃣  في تيرمينال تاني ابدا:        ${GREEN}exos-agent chat${NC}"
+echo -e "      أو مهمة مباشرة:               ${GREEN}exos-agent run \"اعملي سكربت بايثون\"${NC}"
+echo -e "      أو الواجهة الكاملة:            ${GREEN}exos-agent${NC}"
+echo
+echo -e "  ${DIM}📖 الدليل الكامل: https://github.com/$REPO/blob/main/QUICKSTART.md${NC}"
+echo -e "  ${DIM}📢 قناة التليجرام — تحديثات ودعم: https://t.me/HackerExos_VIP${NC}"
+echo -e "  ${DIM}👨‍💻 المطور: https://t.me/HackerExos${NC}"
+echo
