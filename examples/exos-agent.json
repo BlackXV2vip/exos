@@ -1,0 +1,13 @@
+{
+  "$schema": "https://exos-agent.ai/config.json",
+  "provider": {
+    "exos": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Exos Agent",
+      "options": { "baseURL": "http://127.0.0.1:8791/v1", "apiKey": "public" },
+      "models": { "exos-1": { "name": "Exos Agent", "tools": true } }
+    }
+  },
+  "model": "exos/exos-1",
+  "small_model": "exos/exos-1"
+}

@@ -1,0 +1,7 @@
+node_modules/
+dist/
+packages/*/dist/
+*.log
+.turbo/
+.next/
+.cache/
