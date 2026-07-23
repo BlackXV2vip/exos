@@ -53,7 +53,7 @@ exos-agent upgrade
 
 ```bash
 curl -L -o exos-agent.tar.gz \
-  https://github.com/BlackXV2vip/exos/releases/download/v1.18.6/exos-agent-linux-x64.tar.gz
+  https://github.com/BlackXV2vip/exos/releases/download/v1.18.7/exos-agent-linux-x64.tar.gz
 
 # (اختياري) تأكد من سلامة الملف — لازم يطلع نفس الهاش ده:
 sha256sum exos-agent.tar.gz
@@ -65,7 +65,7 @@ sha256sum exos-agent.tar.gz
 ```bash
 tar xzf exos-agent.tar.gz        # بيطلع ملف واحد اسمه exos-agent
 chmod +x exos-agent
-./exos-agent --version           # ✅ المفروض يطبع: 1.18.6
+./exos-agent --version           # ✅ المفروض يطبع: 1.18.7
 ```
 
 > حبيت تخليه أمر عام؟ `sudo mv exos-agent /usr/local/bin/`
@@ -142,7 +142,7 @@ Linux **x86_64**, and Python 3.8+ (only for the included free bridge).
 
 ```bash
 curl -L -o exos-agent.tar.gz \
-  https://github.com/BlackXV2vip/exos/releases/download/v1.18.6/exos-agent-linux-x64.tar.gz
+  https://github.com/BlackXV2vip/exos/releases/download/v1.18.7/exos-agent-linux-x64.tar.gz
 
 # (optional) verify integrity — must print:
 sha256sum exos-agent.tar.gz
@@ -154,7 +154,7 @@ sha256sum exos-agent.tar.gz
 ```bash
 tar xzf exos-agent.tar.gz        # yields a single file: exos-agent
 chmod +x exos-agent
-./exos-agent --version           # ✅ prints: 1.18.6
+./exos-agent --version           # ✅ prints: 1.18.7
 ```
 
 ### 3 — Start the free bridge (Exos Adapter)
@@ -194,19 +194,21 @@ cp examples/exos-agent.json ~/.config/exos-agent/exos-agent.json
 
 ---
 
-## ✅ Verified live (2026-07-23 — v1.18.6)
+## ✅ Verified live (2026-07-23 — v1.18.7)
 
 | Check | Result |
 |---|---|
 | 🌐 **Web UI embedded & served** from the binary | ✅ `exos-agent serve` → `<title>Exos Agent</title>` |
 | `serve` command branding | ✅ "starts a headless exos-agent server" |
-| `exos-agent --version` — Linux **x64** | ✅ `1.18.6` |
-| `exos-agent --version` — Linux **ARM64** (via qemu) | ✅ `1.18.6` |
+| `exos-agent --version` — Linux **x64** | ✅ `1.18.7` |
+| `exos-agent --version` — Linux **ARM64** (via qemu) | ✅ `1.18.7` |
 | Zero legacy-name strings in **both** binaries | ✅ 0 occurrences |
 | **One-command installer** (`curl\|bash`) end-to-end | ✅ binary + bridge + config + `exos-bridge` (tested x64 & aarch64) |
 | Installer's automatic SHA256 verification | ✅ "الهاش مطابق — الملف أصلي" |
 | Real agentic task on the release binary | ✅ wrote `v.txt` → exact content |
 | Interactive `chat` session memory (2 turns, Arabic) | ✅ remembered the user's name in 2.6s |
+| Web UI «New session» on a **fresh server without projects** (the bug reported by the user) | ✅ fixed in v1.18.7 — navigates to composer instantly (Playwright E2E) |
+| Web UI full chat loop in Arabic (send → reply) | ✅ «قولي ازيك» ← «أنا بخير» in 6s, auto Arabic session title |
 
 > المزيد من اختبارات الأدوات الصعبة: [TESTING.md](TESTING.md)
 

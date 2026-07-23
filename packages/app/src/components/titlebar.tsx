@@ -321,7 +321,7 @@ export function Titlebar(props: { update?: TitlebarUpdate; debugTools?: { visibl
               tabsStoreActions.removeSessions(detail)
             })
 
-            const openNewTab = () => {
+            const openNewTab = async () => {
               const route = layout.route()
               const activeSession = session()
               if (route.type === "session" && activeSession) {
@@ -367,9 +367,25 @@ export function Titlebar(props: { update?: TitlebarUpdate; debugTools?: { visibl
                 const project = global.ensureServerCtx(conn).projects.list()[0]
                 return project ? [{ server: ServerConnection.key(conn), project }] : []
               })[0]
-              if (!fallback) return
+              if (fallback) {
+                tabs.newDraft({ server: fallback.server, directory: fallback.project.worktree }, "")
+                return
+              }
 
-              tabs.newDraft({ server: fallback.server, directory: fallback.project.worktree }, "")
+              // Exos improvement: on a fresh server with no projects added yet,
+              // ask the server for its current working directory and use it, so the
+              // very first "New session" click works instead of silently doing nothing.
+              const conn = server.current ?? global.servers.list()[0]
+              if (!conn) return
+
+              try {
+                const res = await fetch(new URL("/path", conn.http.url))
+                const info = (await res.json()) as { directory?: string }
+                if (!info?.directory) return
+                tabs.newDraft({ server: ServerConnection.key(conn), directory: info.directory }, "")
+              } catch {
+                // server unreachable — nothing sensible to fall back to
+              }
             }
             const toggleHome = () => tabs.toggleHome({ home: layout.route().type === "home", current: currentTab() })
 

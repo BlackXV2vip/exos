@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/BlackXV2vip/exos/releases"><img alt="Version" src="https://img.shields.io/badge/version-1.18.6-00e5ff"></a>
+  <a href="https://github.com/BlackXV2vip/exos/releases"><img alt="Version" src="https://img.shields.io/badge/version-1.18.7-00e5ff"></a>
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-22c55e"></a>
   <a href="https://t.me/HackerExos_VIP"><img alt="Telegram Channel" src="https://img.shields.io/badge/Telegram-Channel-26A5E4?logo=telegram&logoColor=white"></a>
   <a href="https://t.me/HackerExos"><img alt="Developer" src="https://img.shields.io/badge/Dev-@HackerExos-8b5cf6?logo=telegram&logoColor=white"></a>
@@ -82,7 +82,7 @@ curl -fsSL https://raw.githubusercontent.com/BlackXV2vip/exos/main/install | bas
 
 # ومن إصدار v1.18.6 وفايت — أمر التحديث المدمج بقى شغال:
 exos-agent upgrade            # لآخر إصدار
-exos-agent upgrade 1.18.6     # لإصدار محدد
+exos-agent upgrade 1.18.7     # لإصدار محدد
 ```
 
 ### 🛠️ يدوي | Manual
@@ -90,7 +90,7 @@ exos-agent upgrade 1.18.6     # لإصدار محدد
 ```bash
 # 1) download the release binary (Linux x64)
 curl -L -o exos-agent.tar.gz \
-  https://github.com/BlackXV2vip/exos/releases/download/v1.18.6/exos-agent-linux-x64.tar.gz
+  https://github.com/BlackXV2vip/exos/releases/download/v1.18.7/exos-agent-linux-x64.tar.gz
 tar xzf exos-agent.tar.gz && chmod +x exos-agent
 
 # 2) start the included free bridge (any OpenAI-compatible provider works too)

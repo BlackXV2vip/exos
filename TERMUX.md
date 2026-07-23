@@ -46,7 +46,7 @@ curl -fsSL https://raw.githubusercontent.com/BlackXV2vip/exos/main/install | bas
 ```bash
 # بعد التثبيت:
 export PATH="$HOME/.local/bin:$PATH"   # أو اقفل وافتح proot من جديد
-exos-agent --version                    # ✅ المفروض يطبع: 1.18.6
+exos-agent --version                    # ✅ المفروض يطبع: 1.18.7
 ```
 
 ### 5️⃣ التشغيل (بـ tmux — أريح طريقة على الموبايل)
@@ -146,7 +146,7 @@ exos-agent chat      # window 1 — talk to your agent 🎉
 | التحقق Check | النتيجة Result |
 |---|---|
 | بناء باينري `linux-arm64` من المصدر | ✅ `ELF 64-bit ARM aarch64, glibc` |
-| تشغيل فعلي على معمارية ARM64 (محاكي qemu) | ✅ `--version` → `1.18.6` |
+| تشغيل فعلي على معمارية ARM64 (محاكي qemu) | ✅ `--version` → `1.18.7` |
 | المثبّت بيكتشف aarch64 وينزّل نسخة الموبايل | ✅ مكتشف تلقائي |
 | صفر آثار لأي اسم قديم في باينري ARM64 | ✅ 0 |
 | 🌐 الواجهة الويب مدموجة ومسحوبة من الباينري نفسه | ✅ `<title>Exos Agent</title>` |

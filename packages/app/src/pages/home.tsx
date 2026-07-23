@@ -328,11 +328,21 @@ export function NewHome() {
   )
   const homedir = createMemo(() => focusedSync().data.path.home ?? "")
   const selectedProject = createMemo(() => projects().find((project) => project.worktree === selection().directory))
+  // Exos improvement: if no project has been added yet (e.g. the server was started in a
+  // directory without a git repo), fall back to the server's current working directory.
+  // Without this, "New session" silently does nothing on a fresh server and there is no
+  // way to create a session without manually adding a project first.
+  const serverCwdProject = createMemo(() => {
+    const directory = focusedSync().data.path?.directory
+    if (!directory) return undefined
+    return { worktree: directory } as LocalProject
+  })
   const newSessionProject = createMemo(
     () =>
       selectedProject() ??
       projects().find((project) => project.worktree === focusedServerCtx()?.projects.last()) ??
-      projects()[0],
+      projects()[0] ??
+      serverCwdProject(),
   )
   const directories = (project: LocalProject) => [project.worktree, ...(project.sandboxes ?? [])]
   const projectDirectories = createMemo(() => {
