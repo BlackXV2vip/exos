@@ -1,0 +1,36 @@
+{
+  "name": "@exos-agent/vendor-poe-auth",
+  "version": "0.0.1",
+  "description": "Poe OAuth authentication plugin for Exos Agent",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "keywords": [
+    "exos-agent",
+    "poe",
+    "oauth",
+    "oauth2",
+    "authentication",
+    "auth",
+    "login",
+    "pkce",
+    "plugin",
+    "ai",
+    "typescript"
+  ],
+  "license": "MIT",
+  "peerDependencies": {
+    "@exos-agent-ai/plugin": "*"
+  },
+  "dependencies": {
+    "open": "^10.0.0",
+    "poe-oauth": "*"
+  },
+  "private": true
+}
